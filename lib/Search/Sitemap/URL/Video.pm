@@ -169,7 +169,6 @@ sub build_video_elts {
 
     my @elements;
     for my $f (@{ $self->fields }) {
-        warn "Doing [$f]";
         my $exists = $self->can( "has_$f" );
         next if $exists and not $self->$exists;
 
