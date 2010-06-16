@@ -73,14 +73,12 @@ has 'publication_date'      => (
     predicate   => 'has_publication_date',
 );
 
-# TODO permitir array, generar multiples elementos
 has 'tag'                   => (
     is          => 'rw',
     isa         => ArrayRef[Str],
     predicate   => 'has_tag',
 );
 
-# TODO permitir array, generar multiples elementos
 has 'category'              => (
     is          => 'rw',
     isa         => ArrayRef[Str],
@@ -113,6 +111,12 @@ has 'fields'                => (
                             family_friendly
                         /] },
 );
+
+sub _family_friendly_as_elt {
+    my $self = shift;
+
+    return $self->family_friendly ? 'Yes' : 'No';
+}
 
 sub _content_loc_as_elt {
     my $self = shift;
@@ -170,16 +174,26 @@ sub build_video_elts {
         next if $exists and not $self->$exists;
 
         my $method = '_'.$f.'_as_elt';
+
         my $val;
         if ( $self->can( $method ) ) {
             $val = $self->$method();
         } else {
-            $val = XML::Twig::Elt->new( '#PCDATA' => $self->$f() );
+            $val =  $self->$f();
         }
+
         next unless $val;
-        next unless blessed $val;
-        next unless $val->isa( 'XML::Twig::Elt' );
-        push( @elements, $val->wrap_in( "video:$f" ) );
+
+        if (ref $val ne 'ARRAY') {
+            $val = [ $val ];
+        }
+        foreach my $value (@$val) {
+            if (!blessed $value) {
+                $value = XML::Twig::Elt->new( '#PCDATA' => $value );
+            }
+            next unless $value->isa( 'XML::Twig::Elt' );
+            push( @elements, $value->wrap_in( "video:$f" ) );
+        }
     }
 
     return @elements;
