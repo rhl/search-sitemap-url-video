@@ -5,6 +5,27 @@ use MooseX::Types::URI qw( Uri );
 use MooseX::Types::Moose qw( Str HashRef Bool ArrayRef CodeRef );
 use HTML::Entities qw( encode_entities );
 
+# ABSTRACT: Video URL support for Search::Sitemap
+
+=head1 SYNOPSIS
+
+    use Search::Sitemap;
+    use Search::Sitemap::URL::Video;
+    my $sitemap = Search::Sitemap->new;
+
+    my $url = Search::Sitemap::URL::Video->new({
+        content_loc => 'http://example.com/video.flv',
+        player_loc  => 'http://example.com/player.swf',
+    });
+
+    $sitemap->add( $url );
+
+=head1 DESCRIPTION
+
+Subclass of Search::Sitemap::URL that allows the creation of video sitemaps, as described in http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=80472
+
+=cut
+
 extends 'Search::Sitemap::URL';
 
 has 'player_loc'            => (
